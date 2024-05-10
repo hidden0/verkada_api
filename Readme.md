@@ -1,6 +1,15 @@
 # Verkada API Framework
+
 Quickly and easily write API integrations with Verkada using python and this framework.
-## Setup
-How to setup this framework for quick and easy access to your API.
-1. Step 1
-2. Step 2
+
+## Usage
+
+ TODO Usage
+
+## Dependencies
+I had to install these from pip3 to run the program without issue. If this list grows too long I'll make a setup script to automatically run pip3 to install them.
+PIP Packages
+- requests
+
+MAC Packages
+- python v3.12
