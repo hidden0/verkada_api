@@ -2,7 +2,7 @@
 #imports
 from datetime import timezone
 from pprint import pprint
-from lib.vapi import Vapi
+from library.vapi import Vapi
 from datetime import datetime, timedelta
 
 def main():
