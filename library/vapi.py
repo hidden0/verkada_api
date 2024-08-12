@@ -176,7 +176,7 @@ class Vapi:
             "time_ms": time_ms
         }
         
-        response = self.send_request("POST", url, headers=headers, json_data=data)
+        response = requests.post(url, headers=headers, json=data)
         return response
 
     # TODO [] Generate streaming API key test
