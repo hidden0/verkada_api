@@ -11,7 +11,7 @@ def main():
 
     # Define camera and organization IDs
     org_id = "48684ea6-d592-436f-a282-5f6aad829d06"
-    camera_id = "a89a5995-5d3b-4b69-9ade-11c201952be0"
+    camera_id = "663c5bbf-e033-40fb-b9f5-e0437560840f"
 
     # Calculate the start and end times for the last hour
     end_time = datetime.now(timezone.utc)

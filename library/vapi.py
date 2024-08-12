@@ -104,6 +104,7 @@ class Vapi:
             self.key_test(self.API_KEY)
 
     def load_api_key(self, env_var, cred_file, key_type):
+
         """Helper method to load an API key from an environment variable, command line, or a credentials file."""
         temp_api_key = None
 
@@ -131,6 +132,7 @@ class Vapi:
             self.API_KEY_METHOD = f"{key_type} from INPUT"
 
         return temp_api_key
+    
     def send_request(self, api_key=None, endpoint=None, params=None):
         if api_key is None:
             api_key = self.API_KEY
@@ -148,6 +150,34 @@ class Vapi:
         }
         url = f"{self.API_URL}/{endpoint}"
         return requests.get(url, headers=headers, params=params)
+    """
+        Posts a Helix event to the Verkada API.
+
+        Args:
+            org_id (str): The organization ID.
+            camera_id (str): The camera ID.
+            attributes (dict): A dictionary of event attributes.
+            time_ms (int): The timestamp of the event in milliseconds.
+            event_type_uid (str): The event type UID. Default is the Helix event UID.
+        
+        Returns:
+            response: The API response object.
+    """
+    def post_helix_event(self, org_id, camera_id, attributes, time_ms, event_type_uid):
+        url = f"https://api.verkada.com/cameras/{self.API_VERSION}/video_tagging/event?org_id={org_id}"
+        headers = {
+            "content-type": "application/json",
+            "x-api-key": self.API_KEY
+        }
+        data = {
+            "attributes": attributes,
+            "event_type_uid": event_type_uid,
+            "camera_id": camera_id,
+            "time_ms": time_ms
+        }
+        
+        response = self.send_request("POST", url, headers=headers, json_data=data)
+        return response
 
     # TODO [] Generate streaming API key test
     def key_test(self, key):
@@ -280,7 +310,6 @@ class Vapi:
         except utils.BaseAPIException as e:
             col.print_error(e)
             sys.exit(e.code)
-
     """
     Load configuration settings from a specified file and assign them to class attributes.
 
@@ -356,6 +385,7 @@ class Vapi:
     def filter_by_product_type(self, device_dict, product_type):
         
         return {device_id: details for device_id, details in device_dict.items() if details['product'] == product_type}
+    
     def get_stream_token(self, TTL=3600):
         token_file = "stream_token.cred"
         
