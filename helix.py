@@ -9,7 +9,7 @@ import serial
 import time
 class Helix:
     def __init__(self, org_id, camera_id, event_type_uid):
-        self.ser = serial.Serial('/dev/ttyACM0')
+        self.ser = serial.Serial("/dev/ttyACM0")
         self.ser.flushInput()
         self.vapi = Vapi()
         self.org_id = org_id
@@ -31,7 +31,7 @@ class Helix:
             try:
                 read_time = int(time.time() * 1000)  # Convert to milliseconds
                 if self.ser.in_waiting > 0:
-                    sensor_data = self.ser.readline().decode('utf-8').rstrip()
+                    sensor_data = self.ser.readline().decode("utf-8").rstrip()
                     attributes = None
                     if(sensor_data>0):
                         attributes = { "mph": sensor_data,
