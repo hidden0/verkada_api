@@ -18,7 +18,7 @@ class Helix:
 
     def post_event(self, attributes, time_ms):
         print(f"OrgID: {self.org_id}")
-        print(f"CaneraID: {self.camera_id}")
+        print(f"CameraID: {self.camera_id}")
         print(f"Attributes: {self.attributes}")
         response = self.vapi.post_helix_event(
             org_id=self.org_id,
@@ -36,11 +36,11 @@ class Helix:
                     sensor_data = self.ser.readline().decode("utf-8").rstrip()
                     attributes = None
                     if(int(sensor_data)>0):
-                        attributes = { "mph": sensor_data,
+                        attributes = { "mph": int(sensor_data),
                                      "direction": "East" }
                         print(f"MPH: {sensor_data} and Direction East")
                     else:
-                        attributes = { "mph": sensor_data*-1,
+                        attributes = { "mph": int(sensor_data)*-1,
                                      "direction": "West" }
                         print(f"MPH: {sensor_data} and Direction West")
                     response = self.post_event(attributes, read_time)
