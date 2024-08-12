@@ -164,7 +164,7 @@ class Vapi:
             response: The API response object.
     """
     def post_helix_event(self, org_id, camera_id, attributes, time_ms, event_type_uid):
-        url = f"https://api.verkada.com/cameras/{self.API_VERSION}/video_tagging/event?org_id={org_id}"
+        url = f"https://api.verkada.com/cameras/{API_VERSION}/video_tagging/event?org_id={org_id}"
         headers = {
             "content-type": "application/json",
             "x-api-key": self.API_KEY
