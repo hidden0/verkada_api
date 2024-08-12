@@ -16,7 +16,10 @@ class Helix:
         self.camera_id = camera_id
         self.event_type_uid = event_type_uid
 
-    def post_event(self, attributes, time_ms):  
+    def post_event(self, attributes, time_ms):
+        print(f"OrgID: {self.org_id}")
+        print(f"CaneraID: {self.camera_id}")
+        print(f"Attributes: {self.attributes}")
         response = self.vapi.post_helix_event(
             org_id=self.org_id,
             camera_id=self.camera_id,
