@@ -7,6 +7,8 @@ from library.vapi import Vapi
 import json
 import serial
 import time
+
+SCALE_FACTOR = 100
 class Helix:
     def __init__(self, org_id, camera_id, event_type_uid):
         for i in range(10):  # Try /dev/ttyACM0 to /dev/ttyACM9
@@ -44,12 +46,12 @@ class Helix:
                     sensor_data = self.ser.readline().decode("utf-8").rstrip()
                     attributes = None
                     if(int(sensor_data)>0):
-                        attributes = { "mph": int(sensor_data),
+                        attributes = { "mph": int(sensor_data*SCALE_FACTOR),
                                      "direction": "East" }
                         #print(f"MPH: {sensor_data} and Direction East")
                         response = self.post_event(attributes, read_time)
                     else:
-                        attributes = { "mph": int(sensor_data)*-1,
+                        attributes = { "mph": int(sensor_data*SCALE_FACTOR)*-1,
                                      "direction": "West" }
                         #print(f"MPH: {sensor_data} and Direction West")
                         response = self.post_event(attributes, read_time)
