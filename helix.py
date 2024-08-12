@@ -39,11 +39,12 @@ class Helix:
                         attributes = { "mph": int(sensor_data),
                                      "direction": "East" }
                         print(f"MPH: {sensor_data} and Direction East")
+                        response = self.post_event(attributes, read_time)
                     else:
                         attributes = { "mph": int(sensor_data)*-1,
                                      "direction": "West" }
                         print(f"MPH: {sensor_data} and Direction West")
-                    response = self.post_event(attributes, read_time)
+                        response = self.post_event(attributes, read_time)
                     print(f"Event Posted: {response.status_code}")
 
             except Exception as e:
