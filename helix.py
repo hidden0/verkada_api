@@ -9,8 +9,18 @@ import serial
 import time
 class Helix:
     def __init__(self, org_id, camera_id, event_type_uid):
-        self.ser = serial.Serial("/dev/ttyACM0")
-        self.ser.flushInput()
+        for i in range(10):  # Try /dev/ttyACM0 to /dev/ttyACM9
+            try:
+                device_name = f"/dev/ttyACM{i}"
+                self.ser = serial.Serial(device_name)
+                self.ser.flushInput()
+                print(f"Connected to {device_name}")
+                break
+            except serial.SerialException:
+                print(f"Failed to connect to {device_name}")
+
+        if self.ser is None:
+            raise Exception("Unable to connect to any serial device")
         self.vapi = Vapi()
         self.org_id = org_id
         self.camera_id = camera_id
@@ -18,9 +28,6 @@ class Helix:
         self.attributes = None
 
     def post_event(self, attributes, time_ms):
-        print(f"OrgID: {self.org_id}")
-        print(f"CameraID: {self.camera_id}")
-        print(f"Attributes: {self.attributes}")
         response = self.vapi.post_helix_event(
             org_id=self.org_id,
             camera_id=self.camera_id,
@@ -39,14 +46,14 @@ class Helix:
                     if(int(sensor_data)>0):
                         attributes = { "mph": int(sensor_data),
                                      "direction": "East" }
-                        print(f"MPH: {sensor_data} and Direction East")
+                        #print(f"MPH: {sensor_data} and Direction East")
                         response = self.post_event(attributes, read_time)
                     else:
                         attributes = { "mph": int(sensor_data)*-1,
                                      "direction": "West" }
-                        print(f"MPH: {sensor_data} and Direction West")
+                        #print(f"MPH: {sensor_data} and Direction West")
                         response = self.post_event(attributes, read_time)
-                    print(f"Event Posted: {response.status_code}")
+                    #print(f"Event Posted: {response.status_code}")
                     attributes = None
 
             except Exception as e:
