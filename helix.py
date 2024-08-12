@@ -15,6 +15,7 @@ class Helix:
         self.org_id = org_id
         self.camera_id = camera_id
         self.event_type_uid = event_type_uid
+        self.attributes = None
 
     def post_event(self, attributes, time_ms):
         print(f"OrgID: {self.org_id}")
@@ -46,6 +47,7 @@ class Helix:
                         print(f"MPH: {sensor_data} and Direction West")
                         response = self.post_event(attributes, read_time)
                     print(f"Event Posted: {response.status_code}")
+                    attributes = None
 
             except Exception as e:
                 print(f"Error: {e}")
