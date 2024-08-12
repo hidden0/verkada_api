@@ -18,7 +18,7 @@ def main():
     start_time = end_time - timedelta(minutes=5)
 
     # Get historic footage
-    vapi.get_historic_footage(camera_id, org_id, start_time, end_time, "6")
+    #vapi.get_historic_footage(camera_id, org_id, start_time, end_time, "6")
     #vapi.download_all_cameras(org_id, start_time, end_time)
 
 if __name__ == "__main__":
