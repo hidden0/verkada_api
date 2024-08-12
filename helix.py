@@ -24,12 +24,12 @@ class Helix:
             time_ms=time_ms,
             event_type_uid=self.event_type_uid
         )
-        return response
-
+        return response 
     def run(self):
         while True:
             try:
                 read_time = int(time.time() * 1000)  # Convert to milliseconds
+                print("Testing")
                 if self.ser.in_waiting > 0:
                     sensor_data = self.ser.readline().decode("utf-8").rstrip()
                     pprint(sensor_data)
@@ -58,6 +58,7 @@ def main():
     event_type_id = "a4cde31e-e984-4fcc-a026-dbd5c80d13e8"
     # Initialize the Helix instance
     helix_event = Helix(org_id, camera_id, event_type_id)
+    helix_event.run()
 
 if __name__ == "__main__":
     main()
