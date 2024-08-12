@@ -45,7 +45,6 @@ class Helix:
                         print(f"MPH: {sensor_data} and Direction West")
                     response = self.post_event(attributes, read_time)
                     print(f"Event Posted: {response.status_code}")
-                    log_data = {"timestamp": read_time, "response_code": response.status_code}
 
             except Exception as e:
                 print(f"Error: {e}")
