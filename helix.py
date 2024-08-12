@@ -29,12 +29,10 @@ class Helix:
         while True:
             try:
                 read_time = int(time.time() * 1000)  # Convert to milliseconds
-                print("Testing")
                 if self.ser.in_waiting > 0:
                     sensor_data = self.ser.readline().decode("utf-8").rstrip()
-                    pprint(sensor_data)
                     attributes = None
-                    if(sensor_data>0):
+                    if(int(sensor_data)>0):
                         attributes = { "mph": sensor_data,
                                      "direction": "East" }
                     else:
