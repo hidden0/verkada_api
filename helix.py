@@ -35,9 +35,11 @@ class Helix:
                     if(int(sensor_data)>0):
                         attributes = { "mph": sensor_data,
                                      "direction": "East" }
+                        print(f"MPH: {sensor_data} and Direction East")
                     else:
                         attributes = { "mph": sensor_data*-1,
                                      "direction": "West" }
+                        print(f"MPH: {sensor_data} and Direction West")
                     response = self.post_event(attributes, read_time)
                     print(f"Event Posted: {response.status_code}")
                     log_data = {"timestamp": read_time, "response_code": response.status_code}
