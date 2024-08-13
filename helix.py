@@ -58,6 +58,7 @@ class Helix:
                             "mph": float(sensor_data) * SCALE_FACTOR * -1,
                             "direction": "West"
                         }
+                        response = self.post_event(attributes, read_time)
                     #print(f"Event Posted: {response.status_code}")
                     attributes = None
 
