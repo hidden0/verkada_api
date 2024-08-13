@@ -51,7 +51,7 @@ class Helix:
                             "mph": float(sensor_data) * SCALE_FACTOR,
                             "direction": "East"
                         }
-                        print(f"MPH: {sensor_data} and Direction East")
+                        print(f"MPH: {float(sensor_data)} and Direction East")
                         response = self.post_event(attributes, read_time)
                         print(f"Event Posted: {response.status_code}")
                     else:
@@ -59,7 +59,7 @@ class Helix:
                             "mph": float(sensor_data) * SCALE_FACTOR * -1,
                             "direction": "West"
                         }
-                        print(f"MPH: {sensor_data} and Direction West")
+                        print(f"MPH: {float(sensor_data)} and Direction West")
                         response = self.post_event(attributes, read_time)
                         print(f"Event Posted: {response.status_code}")
                     attributes = None
