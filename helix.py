@@ -45,13 +45,13 @@ class Helix:
                 if self.ser.in_waiting > 0:
                     sensor_data = self.ser.readline().decode("utf-8").rstrip()
                     attributes = None
-                    if(int(sensor_data*SCALE_FACTOR)>0):
-                        attributes = { "mph": int(sensor_data*SCALE_FACTOR),
+                    if(float(sensor_data)>0):
+                        attributes = { "mph": float(sensor_data*SCALE_FACTOR),
                                      "direction": "East" }
                         #print(f"MPH: {sensor_data} and Direction East")
                         response = self.post_event(attributes, read_time)
                     else:
-                        attributes = { "mph": int(sensor_data*SCALE_FACTOR)*-1,
+                        attributes = { "mph": float(sensor_data*SCALE_FACTOR)*-1,
                                      "direction": "West" }
                         #print(f"MPH: {sensor_data} and Direction West")
                         response = self.post_event(attributes, read_time)
