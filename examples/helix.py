@@ -42,31 +42,14 @@ class Helix:
             event_type_uid=self.event_type_uid
         )
         return response 
+    
     def run(self):
         while True:
             try:
-                read_time = int(time.time() * 1000)  # Convert to milliseconds
                 if self.ser.in_waiting > 0:
-                    sensor_data = self.ser.readline().decode("utf-8").rstrip()
-                    attributes = None
-                    
-                    if float(sensor_data) > 0.0:
-                        attributes = {
-                            "mph": float(sensor_data) * SCALE_FACTOR,
-                            "direction": "East"
-                        }
-                        print(f"MPH: {float(sensor_data)} and Direction East")
-                        #response = self.post_event(attributes, read_time)
-                        #print(f"Event Posted: {response.status_code}")
-                    else:
-                        attributes = {
-                            "mph": float(sensor_data) * SCALE_FACTOR * -1,
-                            "direction": "West"
-                        }
-                        print(f"MPH: {float(sensor_data)} and Direction West")
-                        #response = self.post_event(attributes, read_time)
-                        #print(f"Event Posted: {response.status_code}")
-                    attributes = None
+                    data = self.ser.readline().decode('utf-8').strip()
+                    self.parse_radar_data(data)
+                time.sleep(0.1)
 
             except Exception as e:
                 print(f"Error: {e}")
@@ -84,5 +67,17 @@ def main():
     helix_event = Helix(org_id, camera_id, event_type_id)
     helix_event.run()
 
+def parse_radar_data(self, data):
+    try:
+        json_data = json.loads(data)
+        direction = json_data.get("direction")
+        velocity = json_data.get("DetectedObjectVelocity")
+        print(f"Direction: {direction}, Velocity: {velocity}")
+        
+        # Here you can add logic to post the event to the Vapi class if needed.
+        # self.vapi.post_event(self.org_id, self.camera_id, self.event_type_uid, direction, velocity)
+        
+    except json.JSONDecodeError:
+        print(f"Failed to decode JSON: {data}")
 if __name__ == "__main__":
     main()
