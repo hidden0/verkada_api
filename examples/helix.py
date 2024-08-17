@@ -56,7 +56,7 @@ def format_helix_and_post_event(vapi, org_id, camera_id, event_type_uid, directi
 def main():
     # Initialize the Vapi instance
     vapi = Vapi()
-
+    vapi.load_config()
     # Define camera and organization IDs
     org_id = "48684ea6-d592-436f-a282-5f6aad829d06"
     camera_id = "663c5bbf-e033-40fb-b9f5-e0437560840f"
