@@ -12,7 +12,7 @@ import json
 import serial
 import time
 
-SCALE_FACTOR = 1
+SPEEDING = 25
 class Helix:
     def __init__(self, org_id, camera_id, event_type_uid):
         for i in range(10):  # Try /dev/ttyACM0 to /dev/ttyACM9
@@ -60,9 +60,18 @@ class Helix:
             direction = json_data.get("direction")
             velocity = json_data.get("DetectedObjectVelocity")
             print(f"Direction: {direction}, Velocity: {velocity}")
-            
-            # Here you can add logic to post the event to the Vapi class if needed.
-            # self.vapi.post_event(self.org_id, self.camera_id, self.event_type_uid, direction, velocity)
+            if(velocity>SPEEDING):
+                dir = None
+                if(direction=="inbound"):
+                    dir = "East"
+                else:
+                    dir = "West"
+                read_time = int(time.time() * 1000)  # Convert to milliseconds
+                self.attributes = {
+                    "direction": dir,
+                    "mph": velocity
+                }
+                self.vapi.post_helix_event(self.camera_id, self.attributes, read_time, self.event_type_uid, self.org_id)
             
         except json.JSONDecodeError:
             print(f"Failed to decode JSON: {data}")
