@@ -54,7 +54,18 @@ class Helix:
             except Exception as e:
                 print(f"Error: {e}")
             time.sleep(1)  # Add delay to prevent high CPU usage
-
+    def parse_radar_data(self, data):
+        try:
+            json_data = json.loads(data)
+            direction = json_data.get("direction")
+            velocity = json_data.get("DetectedObjectVelocity")
+            print(f"Direction: {direction}, Velocity: {velocity}")
+            
+            # Here you can add logic to post the event to the Vapi class if needed.
+            # self.vapi.post_event(self.org_id, self.camera_id, self.event_type_uid, direction, velocity)
+            
+        except json.JSONDecodeError:
+            print(f"Failed to decode JSON: {data}")
 
 
 def main():
@@ -67,17 +78,5 @@ def main():
     helix_event = Helix(org_id, camera_id, event_type_id)
     helix_event.run()
 
-def parse_radar_data(self, data):
-    try:
-        json_data = json.loads(data)
-        direction = json_data.get("direction")
-        velocity = json_data.get("DetectedObjectVelocity")
-        print(f"Direction: {direction}, Velocity: {velocity}")
-        
-        # Here you can add logic to post the event to the Vapi class if needed.
-        # self.vapi.post_event(self.org_id, self.camera_id, self.event_type_uid, direction, velocity)
-        
-    except json.JSONDecodeError:
-        print(f"Failed to decode JSON: {data}")
 if __name__ == "__main__":
     main()
