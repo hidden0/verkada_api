@@ -147,11 +147,10 @@ class Vapi:
                 "x-api-key": api_key
             }
             url = f"{self.API_URL}/{endpoint}"
-            response = requests.get(url, headers=headers, params=params)
-            return response
-        except:
+            return requests.get(url, headers=headers, params=params)
+        except Exception:
             self.handle_http_errors(
-                    response.status_code,
+                    0,
                     f"{self.API_URL}/{endpoint}",
                     self.API_KEY,
                 )
