@@ -20,6 +20,7 @@ import subprocess
 import time
 import threading
 from tqdm import tqdm
+import pprint
 
 # TODO Add ability to load different config files
 
@@ -527,7 +528,7 @@ class Vapi:
             response: The API response object.
     """
     def post_helix_event(self, camera_id, attributes, time_ms, event_type_uid, org_id=None):
-        if(org_id==None):
+        if org_id is None:
             org_id=self.ORG_ID
         headers = {
             "content-type": "application/json",
@@ -539,7 +540,8 @@ class Vapi:
             "camera_id": camera_id,
             "time_ms": time_ms
         }
-
-        response = self.send_request(endpoint=f"{EP_HELIX}?org_id={org_id}", params=data)
-        return response
+        pprint(headers)
+        pprint(data)
+        pprint(f"{EP_HELIX}?org_id={org_id}")
+        return self.send_request(endpoint=f"{EP_HELIX}?org_id={org_id}", params=data)
         

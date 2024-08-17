@@ -34,14 +34,13 @@ class Helix:
         self.attributes = None
 
     def post_event(self, attributes, time_ms):
-        response = self.vapi.post_helix_event(
+        return self.vapi.post_helix_event(
             org_id=self.org_id,
             camera_id=self.camera_id,
             attributes=attributes,
             time_ms=time_ms,
-            event_type_uid=self.event_type_uid
-        )
-        return response 
+            event_type_uid=self.event_type_uid,
+        ) 
     
     def run(self):
         while True:
@@ -60,24 +59,23 @@ class Helix:
             direction = json_data.get("direction")
             velocity = int(json_data.get("DetectedObjectVelocity"))
             print(f"Direction: {direction}, Velocity: {velocity}")
-            if(velocity<0):
-                velocity=velocity*-1
-            if(velocity>SPEEDING):
-                dir = None
-                if(direction=="inbound"):
-                    dir = "East"
-                else:
-                    dir = "West"
-                read_time = int(time.time() * 1000)  # Convert to milliseconds
-                self.attributes = {
-                    "direction": dir,
-                    "mph": velocity
-                }
-                response = self.vapi.post_helix_event(self.camera_id, self.attributes, read_time, self.event_type_uid, self.org_id)
-                pprint(response)
-            
+            if (velocity<0):
+                velocity *= -1
+            if (velocity>SPEEDING):
+                self.formt_helix(direction, velocity)
         except json.JSONDecodeError:
             print(f"Failed to decode JSON: {data}")
+
+    def formt_helix(self, direction, velocity):
+        newDir = None
+        newDir = "East" if (direction=="inbound") else "West"
+        read_time = int(time.time() * 1000)  # Convert to milliseconds
+        self.attributes = {
+            "direction": dir,
+            "mph": velocity
+        }
+        response = self.vapi.post_helix_event(self.camera_id, self.attributes, read_time, self.event_type_uid, self.org_id)
+        pprint(response)
 
 
 def main():
