@@ -12,7 +12,7 @@ import json
 import serial
 import time
 
-SCALE_FACTOR = 100
+SCALE_FACTOR = 1
 class Helix:
     def __init__(self, org_id, camera_id, event_type_uid):
         for i in range(10):  # Try /dev/ttyACM0 to /dev/ttyACM9
@@ -56,16 +56,16 @@ class Helix:
                             "direction": "East"
                         }
                         print(f"MPH: {float(sensor_data)} and Direction East")
-                        response = self.post_event(attributes, read_time)
-                        print(f"Event Posted: {response.status_code}")
+                        #response = self.post_event(attributes, read_time)
+                        #print(f"Event Posted: {response.status_code}")
                     else:
                         attributes = {
                             "mph": float(sensor_data) * SCALE_FACTOR * -1,
                             "direction": "West"
                         }
                         print(f"MPH: {float(sensor_data)} and Direction West")
-                        response = self.post_event(attributes, read_time)
-                        print(f"Event Posted: {response.status_code}")
+                        #response = self.post_event(attributes, read_time)
+                        #print(f"Event Posted: {response.status_code}")
                     attributes = None
 
             except Exception as e:
