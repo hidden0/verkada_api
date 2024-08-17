@@ -13,8 +13,10 @@ import serial
 import time
 
 SPEEDING = 25
+
 class Helix:
     def __init__(self, org_id, camera_id, event_type_uid):
+        self.ser = None
         for i in range(10):  # Try /dev/ttyACM0 to /dev/ttyACM9
             try:
                 device_name = f"/dev/ttyACM{i}"
@@ -41,7 +43,7 @@ class Helix:
             time_ms=time_ms,
             event_type_uid=self.event_type_uid,
         ) 
-    
+
     def run(self):
         while True:
             try:
@@ -49,29 +51,26 @@ class Helix:
                     data = self.ser.readline().decode('utf-8').strip()
                     self.parse_radar_data(data)
                 time.sleep(0.1)
-
             except Exception as e:
                 print(f"Error: {e}")
-            time.sleep(1)  # Add delay to prevent high CPU usage
+                time.sleep(1)  # Add delay to prevent high CPU usage
+
     def parse_radar_data(self, data):
         try:
             json_data = json.loads(data)
             direction = json_data.get("direction")
-            velocity = int(json_data.get("DetectedObjectVelocity"))
+            velocity = abs(int(json_data.get("DetectedObjectVelocity", 0)))
             print(f"Direction: {direction}, Velocity: {velocity}")
-            if (velocity<0):
-                velocity *= -1
-            if (velocity>SPEEDING):
-                self.formt_helix(direction, velocity)
+            if velocity > SPEEDING:
+                self.format_helix(direction, velocity)
         except json.JSONDecodeError:
             print(f"Failed to decode JSON: {data}")
 
-    def formt_helix(self, direction, velocity):
-        newDir = None
-        newDir = "East" if (direction=="inbound") else "West"
+    def format_helix(self, direction, velocity):
+        newDir = "East" if direction == "inbound" else "West"
         read_time = int(time.time() * 1000)  # Convert to milliseconds
         self.attributes = {
-            "direction": dir,
+            "direction": newDir,
             "mph": velocity
         }
         response = self.vapi.post_helix_event(self.camera_id, self.attributes, read_time, self.event_type_uid, self.org_id)
