@@ -73,6 +73,7 @@ class Helix:
             "direction": newDir,
             "mph": velocity
         }
+        print("Sending HELIX")
         response = self.vapi.post_helix_event(self.camera_id, self.attributes, read_time, self.event_type_uid, self.org_id)
         pprint(response)
 
