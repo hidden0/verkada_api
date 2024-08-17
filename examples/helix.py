@@ -24,14 +24,15 @@ def connect_to_serial():
     raise Exception("Unable to connect to any serial device")
 
 def post_event(vapi, org_id, camera_id, attributes, time_ms, event_type_uid):
-    response = vapi.post_helix_event(
+    #response = vapi.post_helix_event(
         org_id=org_id,
         camera_id=camera_id,
         attributes=attributes,
         time_ms=time_ms,
         event_type_uid=event_type_uid,
     )
-    pprint(response)
+    #pprint(response)
+    print("testing")
 
 def parse_radar_data(vapi, org_id, camera_id, event_type_uid, data):
     try:
