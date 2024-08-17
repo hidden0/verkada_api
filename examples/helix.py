@@ -73,7 +73,8 @@ class Helix:
                     "direction": dir,
                     "mph": velocity
                 }
-                self.vapi.post_helix_event(self.camera_id, self.attributes, read_time, self.event_type_uid, self.org_id)
+                response = self.vapi.post_helix_event(self.camera_id, self.attributes, read_time, self.event_type_uid, self.org_id)
+                pprint(response)
             
         except json.JSONDecodeError:
             print(f"Failed to decode JSON: {data}")
