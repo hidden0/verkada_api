@@ -58,7 +58,7 @@ class Helix:
         try:
             json_data = json.loads(data)
             direction = json_data.get("direction")
-            velocity = json_data.get("DetectedObjectVelocity")
+            velocity = int(json_data.get("DetectedObjectVelocity"))
             print(f"Direction: {direction}, Velocity: {velocity}")
             if(velocity>SPEEDING):
                 dir = None
