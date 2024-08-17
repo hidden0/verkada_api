@@ -44,6 +44,9 @@ EP_CAMERA_FOOTAGE_TOKEN = f"{PRODUCT_CAMERA}/{API_VERSION}/footage/token"
 EP_ALARM_DEVICES = f"{PRODUCT_ALARMS}/{API_VERSION}/devices"
 EP_ALARM_SITES = f"{PRODUCT_ALARMS}/{API_VERSION}/sites"
 
+## Endpoint Constants - Helix
+EP_HELIX = f"{PRODUCT_CAMERA}/{API_VERSION}/video_tagging/event"
+
 """
 Vapi class for handling API key initialization, configuration loading, HTTP error handling, and device data retrieval.
 
@@ -56,6 +59,7 @@ class Vapi:
     STREAMING_API_KEY = None
     API_URL = None
     API_KEY_VALID = False
+    ORG_ID = None
 
     # Fields of the API call itself
     API_ENDPOINT = None
@@ -134,14 +138,22 @@ class Vapi:
         return temp_api_key
     
     def send_request(self, api_key=None, endpoint=None, params=None):
-        if api_key is None:
-            api_key = self.API_KEY
-        headers = {
-            "accept": "application/json",
-            "x-api-key": api_key
-        }
-        url = f"{self.API_URL}/{endpoint}"
-        return requests.get(url, headers=headers, params=params)
+        try:
+            if api_key is None:
+                api_key = self.API_KEY
+            headers = {
+                "accept": "application/json",
+                "x-api-key": api_key
+            }
+            url = f"{self.API_URL}/{endpoint}"
+            response = requests.get(url, headers=headers, params=params)
+            return response
+        except:
+            self.handle_http_errors(
+                    response.status_code,
+                    f"{self.API_URL}/{endpoint}",
+                    self.API_KEY,
+                )
     
     def send_streaming_request(self, endpoint, params=None):
         headers = {
@@ -150,35 +162,7 @@ class Vapi:
         }
         url = f"{self.API_URL}/{endpoint}"
         return requests.get(url, headers=headers, params=params)
-    """
-        Posts a Helix event to the Verkada API.
-
-        Args:
-            org_id (str): The organization ID.
-            camera_id (str): The camera ID.
-            attributes (dict): A dictionary of event attributes.
-            time_ms (int): The timestamp of the event in milliseconds.
-            event_type_uid (str): The event type UID. Default is the Helix event UID.
-        
-        Returns:
-            response: The API response object.
-    """
-    def post_helix_event(self, org_id, camera_id, attributes, time_ms, event_type_uid):
-        url = f"https://api.verkada.com/cameras/{API_VERSION}/video_tagging/event?org_id={org_id}"
-        headers = {
-            "content-type": "application/json",
-            "x-api-key": self.API_KEY
-        }
-        data = {
-            "attributes": attributes,
-            "event_type_uid": event_type_uid,
-            "camera_id": camera_id,
-            "time_ms": time_ms
-        }
-        
-        response = requests.post(url, headers=headers, json=data)
-        return response
-
+    
     # TODO [] Generate streaming API key test
     def key_test(self, key):
         # Make sure the key is the right length and format
@@ -339,6 +323,7 @@ class Vapi:
             self.API_DEFAULT_STREAMING_CRED_FILE = config['DEFAULT']['API_DEFAULT_STREAMING_CREDENTIALS_FILE']
             self.API_ENV_VAR_NAME = config['DEFAULT']['API_ENVIRONMENT_VARIABLE']
             self.API_STREAMING_ENVIRONMENT_VAR_NAME= config['DEFAULT']['API_STREAMING_ENVIRONMENT_VARIABLE']
+            self.ORG_ID = config['DEFAULT']['ORG_ID']
 
         except Exception as e:
             print(f"Error: {str(e)}")
@@ -528,3 +513,33 @@ class Vapi:
                 ]
                 subprocess.run(command, check=True)
                 print(f"Camera {camera_id}: All chunks concatenated into {output_file}")
+    """
+        Posts a Helix event to the Verkada API.
+
+        Args:
+            org_id (str): The organization ID.
+            camera_id (str): The camera ID.
+            attributes (dict): A dictionary of event attributes.
+            time_ms (int): The timestamp of the event in milliseconds.
+            event_type_uid (str): The event type UID. Default is the Helix event UID.
+        
+        Returns:
+            response: The API response object.
+    """
+    def post_helix_event(self, camera_id, attributes, time_ms, event_type_uid, org_id=None):
+        if(org_id==None):
+            org_id=self.ORG_ID
+        headers = {
+            "content-type": "application/json",
+            "x-api-key": self.API_KEY
+        }
+        data = {
+            "attributes": attributes,
+            "event_type_uid": event_type_uid,
+            "camera_id": camera_id,
+            "time_ms": time_ms
+        }
+
+        response = self.send_request(endpoint=f"{EP_HELIX}?org_id={org_id}", params=data)
+        return response
+        

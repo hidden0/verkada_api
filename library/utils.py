@@ -34,6 +34,7 @@ class colors:
         error_prefix = colors.colorize(colors.YELLOW, "Traceback: ")
         error_message = colors.colorize(colors.RED, ''.join(e.traceback_info))
         print(error_prefix + error_message)
+        exit(e.code)
 
 class BaseAPIException(Exception):
     """Base exception class for API errors."""
@@ -43,19 +44,7 @@ class BaseAPIException(Exception):
         self.endpoint = endpoint
         self.api_key = api_key
         self.traceback_info = traceback.format_stack()
-        super().__init__(self.format_message())
-
-    def format_message(self):
-        base_message = f"{self.message}\n"
-        if self.endpoint:
-            base_message += f"Endpoint: {self.endpoint}\n"
-        if self.api_key:
-            base_message += f"API Key: {self.api_key}\n"
-        base_message += f"\nTraceback:\n{''.join(self.traceback_info)}"
-        return base_message
-
-    def __str__(self):
-        return self.format_message()
+        super().__init__(colors.print_error(self))
 
 class FailedConfigLoad(BaseAPIException):
     """Custom exception class for Verkada API framework."""

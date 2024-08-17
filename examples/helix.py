@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-# Let's refactor helix.py using the Vapi structure from vapi.py.
+import sys
+import os
+# Add the project root directory to the sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 #imports
 from datetime import timezone, datetime, timedelta
 from pprint import pprint
