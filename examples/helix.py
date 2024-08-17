@@ -12,7 +12,7 @@ import json
 import serial
 import time
 
-SPEEDING = 25
+SPEEDING = 15
 
 class Helix:
     def __init__(self, org_id, camera_id, event_type_uid):
