@@ -51,8 +51,8 @@ def parse_radar_data(vapi, org_id, camera_id, event_type_uid, data):
         direction = json_data.get("direction")
         velocity = abs(int(json_data.get("DetectedObjectVelocity", 0)))
         print(f"Direction: {direction}, Velocity: {velocity}")
-        #if velocity > SPEEDING:
-            #format_helix_and_post_event(vapi, org_id, camera_id, event_type_uid, direction, velocity)
+        if velocity > SPEEDING:
+            format_helix_and_post_event(vapi, org_id, camera_id, event_type_uid, direction, velocity)
     except json.JSONDecodeError:
         print(f"Failed to decode JSON: {data}")
 
