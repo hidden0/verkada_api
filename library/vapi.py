@@ -137,8 +137,7 @@ class Vapi:
 
         return temp_api_key
     
-    def send_request(self, api_key=None, endpoint=None, params=None):
-        print(endpoint)
+    def send_request(self, api_key=None, endpoint=None, params=None, method="GET"):
         try:
             if api_key is None:
                 api_key = self.API_KEY
@@ -147,14 +146,19 @@ class Vapi:
                 "x-api-key": api_key
             }
             url = f"{self.API_URL}/{endpoint}"
-            return requests.get(url, headers=headers, params=params)
+            # Choose the appropriate HTTP method
+            if method.upper() == "POST":
+                return requests.post(url, json=params, headers=headers)
+            elif method.upper() == "GET":
+                return requests.get(url, params=params, headers=headers)
+            else:
+                raise ValueError(f"Unsupported HTTP method: {method}")
         except Exception:
             self.handle_http_errors(
                     0,
                     f"{self.API_URL}/{endpoint}",
                     self.API_KEY,
                 )
-    
     def send_streaming_request(self, endpoint, params=None):
         headers = {
             "accept": "application/json",
@@ -539,5 +543,5 @@ class Vapi:
             "camera_id": camera_id,
             "time_ms": time_ms
         }
-        return self.send_request(endpoint=f"{EP_HELIX}?org_id={org_id}", params=data)
+        return self.send_request(endpoint=f"{EP_HELIX}?org_id={org_id}", params=data, method="POST")
         
