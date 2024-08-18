@@ -34,7 +34,7 @@ def format_helix_and_post_event(vapi, org_id, camera_id, event_type_uid, directi
     post_event(vapi, org_id, camera_id, attributes, read_time, event_type_uid)
 
 def post_event(vapi, org_id, camera_id, attributes, time_ms, event_type_uid):
-    response = vapi.post_helix_event(
+    response = vapi.create_helix_event(
         org_id=org_id,
         camera_id=camera_id,
         attributes=attributes,
