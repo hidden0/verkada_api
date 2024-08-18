@@ -539,9 +539,6 @@ class Vapi:
             "camera_id": camera_id,
             "time_ms": time_ms
         }
-        pprint(headers)
-        pprint(data)
-        pprint(f"{EP_HELIX}?org_id={org_id}")
         #return self.send_request(endpoint=f"{EP_HELIX}?org_id={org_id}", params=data)
         return "Yo"
         
