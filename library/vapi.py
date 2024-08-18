@@ -20,7 +20,6 @@ import subprocess
 import time
 import threading
 from tqdm import tqdm
-import pprint
 
 # TODO Add ability to load different config files
 
@@ -539,6 +538,5 @@ class Vapi:
             "camera_id": camera_id,
             "time_ms": time_ms
         }
-        #return self.send_request(endpoint=f"{EP_HELIX}?org_id={org_id}", params=data)
-        return "Yo"
+        return self.send_request(endpoint=f"{EP_HELIX}?org_id={org_id}", params=data)
         
