@@ -1,16 +1,15 @@
 from library.base_vapi import BaseVapi
 import library.utils as utils
-import sys
 class HelixVapi(BaseVapi):
     def __init__(self, run_test=False):
         super().__init__(run_test)
     
     def post_helix_event(self, camera_id, attributes, time_ms, event_type_uid, org_id=None):
         if org_id is None:
-            org_id=self.ORG_ID
+            org_id=self.org_id
         headers = {
             "content-type": "application/json",
-            "x-api-key": self.API_KEY
+            "x-api-key": self.api_key
         }
         data = {
             "attributes": attributes,
