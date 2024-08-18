@@ -9,7 +9,7 @@ import time
 from pprint import pprint
 from library.vapi import Vapi
 
-SPEEDING = 15
+SPEEDING = 25
 
 def connect_to_serial():
     for i in range(10):  # Try /dev/ttyACM0 to /dev/ttyACM9
