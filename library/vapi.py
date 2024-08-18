@@ -138,6 +138,7 @@ class Vapi:
         return temp_api_key
     
     def send_request(self, api_key=None, endpoint=None, params=None):
+        print(endpoint)
         try:
             if api_key is None:
                 api_key = self.API_KEY

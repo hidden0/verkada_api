@@ -24,18 +24,15 @@ def connect_to_serial():
     raise Exception("Unable to connect to any serial device")
 
 def format_helix_and_post_event(vapi, org_id, camera_id, event_type_uid, direction, velocity):
-    print("format_helix_and_post_event is called")
     new_direction = "East" if direction == "inbound" else "West"
     read_time = int(time.time() * 1000)  # Convert to milliseconds
     attributes = {
         "direction": new_direction,
         "mph": velocity
     }
-    print(f"Posting event with attributes: {attributes}")
     post_event(vapi, org_id, camera_id, attributes, read_time, event_type_uid)
 
 def post_event(vapi, org_id, camera_id, attributes, time_ms, event_type_uid):
-    print(f"vapi type before calling post_helix_event: {type(vapi)}")
     response = vapi.post_helix_event(
         org_id=org_id,
         camera_id=camera_id,
