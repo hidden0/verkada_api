@@ -1,24 +1,18 @@
 #!/usr/bin/env python3
-#imports
-from datetime import timezone
+from library.camera_vapi import CameraVapi
+from library.alarms_vapi import AlarmVapi
 from pprint import pprint
-from library.vapi import Vapi
-from datetime import timedelta
-from time import time
-
 def main():
-    # Initialize the Vapi instance
-    vapi = Vapi()
-    # Test helix
-    camera_id = "663c5bbf-e033-40fb-b9f5-e0437560840f"
-    event_type_id = "a4cde31e-e984-4fcc-a026-dbd5c80d13e8"
-    attributes = {
-        "mph": 2,
-        "direction": "Up"        
-    }
-    current_time_ms = int(time() * 1000)
-    print(f"{current_time_ms}")
-    pprint(vapi.post_helix_event(camera_id, attributes=attributes, time_ms=current_time_ms, event_type_uid=event_type_id))
+    # Testing new code structure
+    camera_api = CameraVapi()
+    alarm_api = AlarmVapi()
 
+    cameras = camera_api.get_camera_devices()
+    alarms = alarm_api.get_alarm_devices()
+
+    print("Camera IDs")
+    pprint(cameras)
+    print("\n\nAlarm IDs")
+    pprint(alarms)
 if __name__ == "__main__":
     main()

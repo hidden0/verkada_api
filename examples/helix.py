@@ -7,9 +7,9 @@ import json
 import serial
 import time
 from pprint import pprint
-from library.vapi import Vapi
+from library.helix_vapi import HelixVapi
 
-SPEEDING = 25
+SPEEDING = 30
 
 def connect_to_serial():
     for i in range(10):  # Try /dev/ttyACM0 to /dev/ttyACM9
@@ -21,6 +21,7 @@ def connect_to_serial():
             return ser
         except serial.SerialException:
             print(f"Failed to connect to {device_name}")
+    # sourcery skip: raise-specific-error
     raise Exception("Unable to connect to any serial device")
 
 def format_helix_and_post_event(vapi, org_id, camera_id, event_type_uid, direction, velocity):
@@ -33,14 +34,13 @@ def format_helix_and_post_event(vapi, org_id, camera_id, event_type_uid, directi
     post_event(vapi, org_id, camera_id, attributes, read_time, event_type_uid)
 
 def post_event(vapi, org_id, camera_id, attributes, time_ms, event_type_uid):
-    response = vapi.post_helix_event(
+    response = HelixVapi.post_helix_event(
         org_id=org_id,
         camera_id=camera_id,
         attributes=attributes,
         time_ms=time_ms,
         event_type_uid=event_type_uid,
     )
-    pprint(response)
 
 def parse_radar_data(vapi, org_id, camera_id, event_type_uid, data):
     try:
@@ -55,7 +55,7 @@ def parse_radar_data(vapi, org_id, camera_id, event_type_uid, data):
 
 def main():
     # Initialize the Vapi instance
-    vapi = Vapi()
+    vapi = HelixVapi()
     # Define camera and organization IDs
     org_id = "48684ea6-d592-436f-a282-5f6aad829d06"
     camera_id = "663c5bbf-e033-40fb-b9f5-e0437560840f"
