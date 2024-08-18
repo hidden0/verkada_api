@@ -24,15 +24,14 @@ def connect_to_serial():
     raise Exception("Unable to connect to any serial device")
 
 def post_event(vapi, org_id, camera_id, attributes, time_ms, event_type_uid):
-    '''response = vapi.post_helix_event(
+    response = vapi.post_helix_event(
         org_id=org_id,
         camera_id=camera_id,
         attributes=attributes,
         time_ms=time_ms,
         event_type_uid=event_type_uid,
     )
-    #pprint(response)'''
-    print("testing")
+    pprint(response)
 
 def parse_radar_data(vapi, org_id, camera_id, event_type_uid, data):
     try:
@@ -40,8 +39,8 @@ def parse_radar_data(vapi, org_id, camera_id, event_type_uid, data):
         direction = json_data.get("direction")
         velocity = abs(int(json_data.get("DetectedObjectVelocity", 0)))
         print(f"Direction: {direction}, Velocity: {velocity}")
-        if velocity > SPEEDING:
-            format_helix_and_post_event(vapi, org_id, camera_id, event_type_uid, direction, velocity)
+        '''if velocity > SPEEDING:
+            format_helix_and_post_event(vapi, org_id, camera_id, event_type_uid, direction, velocity)'''
     except json.JSONDecodeError:
         print(f"Failed to decode JSON: {data}")
 
@@ -57,7 +56,6 @@ def format_helix_and_post_event(vapi, org_id, camera_id, event_type_uid, directi
 def main():
     # Initialize the Vapi instance
     vapi = Vapi()
-    vapi.load_config()
     # Define camera and organization IDs
     org_id = "48684ea6-d592-436f-a282-5f6aad829d06"
     camera_id = "663c5bbf-e033-40fb-b9f5-e0437560840f"
