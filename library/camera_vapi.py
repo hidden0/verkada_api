@@ -3,7 +3,7 @@ import library.utils as utils
 import os
 import json
 import requests
-import tqdm
+import tqdm # type: ignore
 import subprocess
 import threading
 from datetime import datetime, timedelta, time
@@ -58,6 +58,9 @@ class CameraVapi(BaseVapi):
             self.handle_http_errors(response.status_code, self.ENDPOINTS['camera_footage_token'], self.api_key)
             return None
 
+    '''
+    This is experimental code below to stream and save footage in real time with the streaming api
+    '''
     def get_historic_footage_chunk(self, camera_id, org_id, chunk_start, chunk_end, chunk_num, semaphore, position):
         with semaphore:
             token = self.get_stream_token()

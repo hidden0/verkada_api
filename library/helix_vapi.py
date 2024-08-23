@@ -148,7 +148,7 @@ class HelixVapi(BaseVapi):
             "time_ms": event_time_ms,
             "event_type_uid": event_uid
         }
-        return self.send_request(self.ENDPOINTS['helix_event'], json=payload, method="PATCH")
+        return self.send_request(self.ENDPOINTS['helix_event'], json=payload, params=params, method="PATCH")
 
     def update_helix_event_type(self, event_type_uid, event_schema):
         """

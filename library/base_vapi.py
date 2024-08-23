@@ -40,7 +40,7 @@ class BaseVapi:
             "alarms": "alarms",
             "events": "events",
         }
-
+        #https://api.verkada.com/cameras/v1/analytics/lpr/license_plate_of_interest?license_plate_id=0001
         self.ENDPOINTS = {
             "camera_devices": f"{self.PRODUCTS['camera']}/{self.api_version}/devices",
             "camera_footage_token": f"{self.PRODUCTS['camera']}/{self.api_version}/footage/token",
@@ -49,6 +49,7 @@ class BaseVapi:
             "helix_event": f"{self.PRODUCTS['camera']}/{self.api_version}/video_tagging/event",
             "helix_event_search": f"{self.PRODUCTS['camera']}/{self.api_version}/video_tagging/event/search",
             "helix_event_type": f"{self.PRODUCTS['camera']}/{self.api_version}/video_tagging/event_type",
+            "license_plate_of_interest": f"{self.PRODUCTS['camera']}/{self.api_version}/analytics/lpr/license_plate_of_interest",
         }
 
     def _load_api_key(self, env_var, cred_file, key_type):
@@ -122,10 +123,17 @@ class BaseVapi:
     
     def send_request(self, endpoint=None, data=None, json=None, params=None, method="GET"):
         try:
-            headers = {
-                "accept": "application/json",
-                "x-api-key": self.api_key
-            }
+            if data is None:
+                headers = {
+                    "accept": "application/json",
+                    "content-type": "application/json",
+                    "x-api-key": self.api_key
+                }
+            else:
+                headers = {
+                    "accept": "application/json",
+                    "x-api-key": self.api_key
+                }
             url = f"{self.api_url}/{endpoint}"
             # Choose the appropriate HTTP method
             if method.upper() == "POST":
@@ -133,7 +141,15 @@ class BaseVapi:
             elif method.upper() == "GET":
                 return requests.get(url, params=params, headers=headers)
             elif method.upper() == "PATCH":
-                return requests.patch(url, data=data, params=params, headers=headers)
+                return (
+                    requests.request(
+                        method, url, params=params, json=json, headers=headers
+                    )
+                    if params
+                    else requests.request(
+                        method, url, data=data, json=json, headers=headers
+                    )
+                )
             elif method.upper() == "PUT":
                 return requests.put(url, data=data, json=json, params=params, headers=headers)
             elif method.upper() == "DELETE":

@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
-from library.camera_vapi import CameraVapi
-from library.alarms_vapi import AlarmVapi
+from library.lpr_vapi import LprVapi
 from pprint import pprint
 def main():
     # Testing new code structure
-    camera_api = CameraVapi()
-    alarm_api = AlarmVapi()
+    lpr = LprVapi()
 
-    cameras = camera_api.get_camera_devices()
-    alarms = alarm_api.get_alarm_devices()
+    #print(lpr.create_license_plate_of_interest("mytest2", 1234568))
+    #print(lpr.update_license_plate_of_interest("1234568", "moot"))
+    print(lpr.delete_license_plate_of_interest("1234568"))
 
-    print("Camera IDs")
-    pprint(cameras)
-    print("\n\nAlarm IDs")
-    pprint(alarms)
 if __name__ == "__main__":
     main()
