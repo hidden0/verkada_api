@@ -56,7 +56,7 @@ class BaseVapi:
         """Helper method to load an API key from various sources."""
         # TODO API KEYs no loading from environment var
         temp_api_key = (sys.argv[1] if len(sys.argv) > 1 else os.getenv(env_var)) or self._load_key_from_file(cred_file)
-
+        print(temp_api_key)
         if temp_api_key is None:
             temp_api_key = input(f"Please enter your {key_type} key: ")
             self.api_key_method = f"{key_type} from INPUT"
