@@ -1,5 +1,6 @@
 from library.base_vapi import BaseVapi
 import library.utils as utils
+import pprint as pprint
 class HelixVapi(BaseVapi):
     """
     HelixVapi provides a set of methods for interacting with the Helix API, allowing management of events, event types, 
@@ -208,13 +209,12 @@ class HelixVapi(BaseVapi):
             "x-api-key": self.api_key
         }
         data = {
-            "org_id": self.org_id,
             "attributes": attributes,
             "event_type_uid": event_type_uid,
             "camera_id": camera_id,
             "time_ms": time_ms, 
         }
-        return self.send_request(endpoint=self.ENDPOINTS['helix_event'], params=data, method="POST")
+        return self.send_request(endpoint=self.ENDPOINTS['helix_event'], json=data, params=org_id, method="POST")
     
     def search_helix_events(self, attribute_filters=None, camera_ids=None, event_start_time_ms=None, event_end_time_ms=None, event_uid=None, flagged=None, keywords=None):
         """

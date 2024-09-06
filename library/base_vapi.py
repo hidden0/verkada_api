@@ -54,6 +54,7 @@ class BaseVapi:
 
     def _load_api_key(self, env_var, cred_file, key_type):
         """Helper method to load an API key from various sources."""
+        # TODO API KEYs no loading from environment var
         temp_api_key = (sys.argv[1] if len(sys.argv) > 1 else os.getenv(env_var)) or self._load_key_from_file(cred_file)
 
         if temp_api_key is None:
@@ -123,49 +124,49 @@ class BaseVapi:
     
     def send_request(self, endpoint=None, data=None, json=None, params=None, method="GET"):
         try:
-            if data is None:
-                headers = {
-                    "accept": "application/json",
-                    "content-type": "application/json",
-                    "x-api-key": self.api_key
-                }
-            else:
-                headers = {
-                    "accept": "application/json",
-                    "x-api-key": self.api_key
-                }
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json",
+                "x-api-key": self.api_key
+            }
             url = f"{self.api_url}/{endpoint}"
-            # Choose the appropriate HTTP method
+
+            # Dynamically build the request arguments
+            request_kwargs = {
+                "headers": headers,
+            }
+
+            if params:
+                request_kwargs["params"] = params
+            if json:
+                request_kwargs["json"] = json
+            if data:
+                request_kwargs["data"] = data
+
+            # Send the appropriate HTTP request based on method
             if method.upper() == "POST":
-                return requests.post(url, data=data, json=json, params=params, headers=headers)
-            elif method.upper() == "GET":
-                return requests.get(url, params=params, headers=headers)
+                return requests.post(url, **request_kwargs)
             elif method.upper() == "PATCH":
-                return (
-                    requests.request(
-                        method, url, params=params, json=json, headers=headers
-                    )
-                    if params
-                    else requests.request(
-                        method, url, data=data, json=json, headers=headers
-                    )
-                )
+                return requests.patch(url, **request_kwargs)
             elif method.upper() == "PUT":
-                return requests.put(url, data=data, json=json, params=params, headers=headers)
+                return requests.put(url, **request_kwargs)
             elif method.upper() == "DELETE":
-                return requests.delete(url, params=params, headers=headers)
+                return requests.delete(url, **request_kwargs)
+            elif method.upper() == "GET":
+                return requests.get(url, **request_kwargs)
             elif method.upper() == "HEAD":
-                return requests.head(url, params=params, headers=headers)
+                return requests.head(url, **request_kwargs)
             elif method.upper() == "OPTIONS":
-                return requests.options(url, params=params, headers=headers)
+                return requests.options(url, **request_kwargs)
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
-        except Exception:
+
+        except Exception as e:
             self.handle_http_errors(
-                    0,
-                    f"{self.api_url}/{endpoint}",
-                    self.api_key,
-                )
+                0,
+                f"{self.api_url}/{endpoint}",
+                self.api_key,
+            )
     
     def send_streaming_request(self, endpoint, params=None):
         headers = {
