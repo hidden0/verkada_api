@@ -25,11 +25,9 @@ class BaseVapi:
         # Load API keys
         self.api_key = self._load_api_key(env_var="VERKADA_API_KEY", cred_file=self.api_default_cred_file, key_type="API")
         self.streaming_api_key = self._load_api_key(env_var="VERKADA_STREAMING_API_KEY", cred_file=self.api_default_streaming_cred_file, key_type="Streaming API")
-
         # Validate the regular API key if run_test is True
         if run_test and self.api_key:
             self._key_test(self.api_key)
-
         # Grouping related constants into dictionaries
         self.PRODUCTS = {
             "camera": "cameras",
@@ -53,17 +51,17 @@ class BaseVapi:
         }
 
     def _load_api_key(self, env_var, cred_file, key_type):
-        """Helper method to load an API key from various sources."""
-        # TODO API KEYs no loading from environment var
-        temp_api_key = (sys.argv[1] if len(sys.argv) > 1 else os.getenv(env_var)) or self._load_key_from_file(cred_file)
-        print(temp_api_key)
+        # Avoid using sys.argv[1] directly to prevent command-line flags from being mistaken as API keys.
+        temp_api_key = os.getenv(env_var) or self._load_key_from_file(cred_file)
+
         if temp_api_key is None:
             temp_api_key = input(f"Please enter your {key_type} key: ")
             self.api_key_method = f"{key_type} from INPUT"
         else:
-            self.api_key_method = f"{key_type} from {self.api_key_method or 'ENV/CLI'}"
+            self.api_key_method = f"{key_type} from {self.api_key_method or 'ENV/FILE'}"
 
         return temp_api_key
+
 
     def _load_key_from_file(self, cred_file):
         """Attempt to load the API key from a credentials file."""
@@ -111,6 +109,7 @@ class BaseVapi:
         # Make sure the key is usable
         # Test API against the AUDIT log which should always be reachable
         try:
+            #print(key)
             response = self.send_request(api_key=key, endpoint="core/v1/audit_log?page_size=100")
             if response.status_code == 200:
                 self.API_KEY = key
@@ -122,13 +121,21 @@ class BaseVapi:
             utils.colors.print_error(e.message)
             exit(e.code)
     
-    def send_request(self, endpoint=None, data=None, json=None, params=None, method="GET"):
+    def send_request(self, api_key=None, endpoint=None, data=None, json=None, params=None, method="GET"):
         try:
-            headers = {
+            headers = {}
+            if api_key is None:
+                headers = {
+                    "accept": "application/json",
+                    "content-type": "application/json",
+                    "x-api-key": self.api_key
+                }
+            else:
+                headers = {
                 "accept": "application/json",
                 "content-type": "application/json",
-                "x-api-key": self.api_key
-            }
+                "x-api-key": api_key
+                }
             url = f"{self.api_url}/{endpoint}"
 
             # Dynamically build the request arguments
@@ -160,13 +167,12 @@ class BaseVapi:
                 return requests.options(url, **request_kwargs)
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
-
+        except requests.exceptions.RequestException as e:
+            utils.error_handler.handle(e, f"HTTP Request failed for URL: {url}")
+            return None
         except Exception as e:
-            self.handle_http_errors(
-                0,
-                f"{self.api_url}/{endpoint}",
-                self.api_key,
-            )
+            utils.error_handler.handle(e, "Unexpected error in send_request")
+            return None
     
     def send_streaming_request(self, endpoint, params=None):
         headers = {
