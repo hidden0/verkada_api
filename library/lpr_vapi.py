@@ -1,3 +1,4 @@
+import pprint
 from library.camera_vapi import CameraVapi
 
 class LprVapi(CameraVapi):
@@ -37,7 +38,7 @@ class LprVapi(CameraVapi):
             HTTPError: If the response status code indicates an error.
         """
         endpoint = f"{self.ENDPOINTS['license_plate_of_interest']}"
-        response = self.send_request(endpoint, params={"license_plate": license_plate_id}, method="DELETE")
+        response = self.send_request(endpoint=endpoint, params={"license_plate": license_plate_id}, method="DELETE")
 
         # Handle errors and return response
         if response.status_code != 200:  # 204 No Content is typically the response for successful deletions
@@ -81,12 +82,11 @@ class LprVapi(CameraVapi):
 
         # Send the PATCH request with JSON body
         response = self.send_request(endpoint, data=None, json=payload, params={"license_plate": license_plate_id}, method="PATCH")
-
         # Handle errors and return response
         if response.status_code != 200:
             response.raise_for_status()
 
-        return response.json()
+        return response
 
 
     def create_license_plate_of_interest(self, license_plate_id, description):
@@ -106,14 +106,21 @@ class LprVapi(CameraVapi):
         Raises:
             HTTPError: If the response status code indicates an error.
         """
+        if len(description) == 0:
+            description = "None"
         endpoint = self.ENDPOINTS['license_plate_of_interest']
-        response = self.send_request(endpoint, json={"description": description, "license_plate": license_plate_id}, method="POST")
+        payload = {
+            "description": description,
+            "license_plate": license_plate_id
+        }
+        response = self.send_request(endpoint=endpoint, json=payload, method="POST")
 
+        pprint.pprint(response)
         # Handle errors and return response
         if response.status_code != 200:
-            response.raise_for_status()
+            pprint.pprint(response)
 
-        return response.json()
+        return response
 
         
 

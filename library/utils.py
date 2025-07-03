@@ -1,17 +1,13 @@
+# utils.py
 import traceback
+import logging
 
 # ANSI escape codes for colors
 class colors:
     RESET = "\033[0m"
     RED = "\033[31m"
-    GREEN = "\033[32m"
     YELLOW = "\033[33m"
-    BLUE = "\033[34m"
-    MAGENTA = "\033[35m"
     CYAN = "\033[36m"
-    WHITE = "\033[37m"
-    BOLD = "\033[1m"
-    UNDERLINE = "\033[4m"
 
     @staticmethod
     def colorize(color, text):
@@ -19,23 +15,39 @@ class colors:
 
     @staticmethod
     def print_error(e):
-        error_prefix = colors.colorize(colors.YELLOW, "Error Message: ")
-        error_message = colors.colorize(colors.CYAN, str(e.message))
-        print(error_prefix + error_message)
+        error_details = [
+            ("Error Message", e.message),
+            ("Endpoint", e.endpoint),
+            ("API Key", e.api_key),
+            ("Traceback", ''.join(e.traceback_info))
+        ]
 
-        error_prefix = colors.colorize(colors.YELLOW, "Endpoint: ")
-        error_message = colors.colorize(colors.CYAN, str(e.endpoint))
-        print(error_prefix + error_message)
+        for label, detail in error_details:
+            if detail:
+                print(
+                    f"{colors.colorize(colors.YELLOW, f'{label}:')} {colors.colorize(colors.CYAN, str(detail))}"
+                )
 
-        error_prefix = colors.colorize(colors.YELLOW, "API Key: ")
-        error_message = colors.colorize(colors.CYAN, str(e.api_key))
-        print(error_prefix + error_message)
-
-        error_prefix = colors.colorize(colors.YELLOW, "Traceback: ")
-        error_message = colors.colorize(colors.RED, ''.join(e.traceback_info))
-        print(error_prefix + error_message)
         exit(e.code)
 
+# General Error Handler Class
+class ErrorHandler:
+    def __init__(self, log_file="errors.log"):
+        logging.basicConfig(filename=log_file, level=logging.ERROR,
+                            format='%(asctime)s - %(levelname)s - %(message)s')
+
+    def handle(self, error, custom_message="An error occurred"):
+        # Log the error details
+        logging.error(f"{custom_message}: {str(error)}")
+        logging.error(f"Traceback: {traceback.format_exc()}")
+
+        # Print the error details to the console for immediate feedback
+        print(f"{colors.colorize(colors.RED, custom_message)}")
+        print(f"{colors.colorize(colors.CYAN, str(error))}")
+        print(f"Traceback: {traceback.format_exc()}")
+
+# Initialize a global instance
+error_handler = ErrorHandler()
 class BaseAPIException(Exception):
     """Base exception class for API errors."""
     def __init__(self, message, code=None, endpoint=None, api_key=None):

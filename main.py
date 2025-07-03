@@ -12,6 +12,11 @@ from library.base_vapi import BaseVapi
 def main():
     # Initialize the Vapi instance
     vapi = BaseVapi()
+<<<<<<< HEAD
     
+=======
+    print(vapi.api_default_cred_file)
+    print(vapi._key_test)
+>>>>>>> b2085b13237049b0ccf59de16d401d16079e19f6
 if __name__ == "__main__":
     main()
