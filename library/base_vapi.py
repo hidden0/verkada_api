@@ -3,6 +3,9 @@ import os
 import configparser
 import library.utils as utils
 import requests
+import time
+
+VALID_KEY_LENGTH = 100
 class BaseVapi:
     def __init__(self, run_test=True):
         self.api_key = None
@@ -19,6 +22,9 @@ class BaseVapi:
         self.api_streaming_environment_var_name = None
         self.api_version = None
 
+        # Token Data
+        self.current_token = None # default to no token
+        self.token_expires_in = 0
         # Load the configuration
         self._load_config()
 
@@ -30,6 +36,8 @@ class BaseVapi:
         if run_test and self.api_key:
             self._key_test(self.api_key)
 
+        # Fetch and set token
+        self.fetch_api_token(self.api_key)
         # Grouping related constants into dictionaries
         self.PRODUCTS = {
             "camera": "cameras",
@@ -52,11 +60,37 @@ class BaseVapi:
             "license_plate_of_interest": f"{self.PRODUCTS['camera']}/{self.api_version}/analytics/lpr/license_plate_of_interest",
         }
 
+    def fetch_api_token(self, region: str = "US") -> str:
+        """
+        Returns a short-lived token to use in the 'x-verkada-auth' header.
+        Caches the token and only refreshes if it's expired or about to expire.
+        """        
+        # If the current token is still valid for at least 2 more minutes, reuse it
+        if self.current_token and time.time() < (self.token_expires_in - 120):
+            return self.current_token
+        
+        # Otherwise, request a new token
+        base_url = "https://api.verkada.com" if region == "US" else "https://api.eu.verkada.com"
+        url = f"{base_url}/token"
+        headers = {
+            "Accept": "application/json",
+            "x-api-key": self.api_key
+        }
+        resp = requests.post(url, headers=headers, timeout=15)
+        resp.raise_for_status()
+        data = resp.json()
+        
+        # Parse the returned token and store it globally
+        new_token = data["token"]
+        self.current_token = new_token
+        self.token_expires_in = int(time.time()) + (30 * 60)  # 30 minutes from now
+    
+        return new_token
+    
     def _load_api_key(self, env_var, cred_file, key_type):
         """Helper method to load an API key from various sources."""
         # TODO API KEYs no loading from environment var
         temp_api_key = (sys.argv[1] if len(sys.argv) > 1 else os.getenv(env_var)) or self._load_key_from_file(cred_file)
-        print(temp_api_key)
         if temp_api_key is None:
             temp_api_key = input(f"Please enter your {key_type} key: ")
             self.api_key_method = f"{key_type} from INPUT"
@@ -101,13 +135,10 @@ class BaseVapi:
         """Stub for testing the API key."""
         # Make sure the key is the right length and format
         try:
-            if len(key) != 40:
+            if len(key) != VALID_KEY_LENGTH:
                 raise utils.InvalidAPIKeyLength(len(key))
-            if not key.startswith("vkd_api_"):
-                raise utils.InvalidAPIKeyFormat()
         except Exception as e:
             print(f"Error: {e.message}")
-
         # Make sure the key is usable
         # Test API against the AUDIT log which should always be reachable
         try:
@@ -122,12 +153,13 @@ class BaseVapi:
             utils.colors.print_error(e.message)
             exit(e.code)
     
-    def send_request(self, endpoint=None, data=None, json=None, params=None, method="GET"):
+    def send_request(self, endpoint=None, api_key=None, data=None, json=None, params=None, method="GET"):
+        self.fetch_api_token()
         try:
             headers = {
                 "accept": "application/json",
                 "content-type": "application/json",
-                "x-api-key": self.api_key
+                "x-verkada-auth": self.current_token
             }
             url = f"{self.api_url}/{endpoint}"
 
